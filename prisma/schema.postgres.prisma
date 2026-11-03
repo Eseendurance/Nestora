@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SEEKER
+  AGENT
+  ADMIN
+}
+
+enum ListingType {
+  RENT
+  SALE
+}
+
+enum ListingStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+  CANCELLED
+}
+
+enum AutomationType {
+  CONTACT_FORM
+  CONTACT_REPLY
+  INQUIRY_CREATED
+  APPOINTMENT_REQUESTED
+  APPOINTMENT_UPDATED
+  LISTING_PUBLISHED
+  AI_CONTENT_GENERATED
+  AI_CHAT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(SEEKER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listings        Listing[]
+  savedListings   SavedListing[]
+  inquiries       Inquiry[]        @relation("Inquirer")
+  received        Inquiry[]        @relation("Receiver")
+  contactMessages ContactMessage[]
+  contactReplies  ContactReply[]
+  appointments    Appointment[]    @relation("Booker")
+  hosted          Appointment[]    @relation("Host")
+  automations     AutomationEvent[]
+  aiConversations AiConversation[]
+}
+
+model Listing {
+  id           String        @id @default(cuid())
+  userId       String
+  title        String
+  slug         String        @unique
+  propertyType String
+  listingType  ListingType
+  status       ListingStatus @default(PUBLISHED)
+  price        Int
+  bedrooms     Int
+  bathrooms    Int
+  areaSqm      Int
+  city         String
+  neighborhood String
+  address      String
+  latitude     Float?
+  longitude    Float?
+  description  String
+  amenities    String        @default("")
+  imageUrl     String?
+  featured     Boolean       @default(false)
+  views        Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedBy      SavedListing[]
+  inquiries    Inquiry[]
+  appointments Appointment[]
+
+  @@index([city])
+  @@index([price])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model SavedListing {
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listingId])
+}
+
+model Inquiry {
+  id        String   @id @default(cuid())
+  listingId String
+  userId    String
+  ownerId   String
+  message   String
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User     @relation("Inquirer", fields: [userId], references: [id], onDelete: Cascade)
+  owner     User     @relation("Receiver", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  replies   ContactReply[]
+
+  @@index([status])
+}
+
+model ContactReply {
+  id        String        @id @default(cuid())
+  messageId String
+  userId    String
+  body      String
+  createdAt DateTime      @default(now())
+  message   ContactMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id           String            @id @default(cuid())
+  listingId    String
+  userId       String
+  ownerId      String
+  scheduledAt  DateTime
+  durationMins Int               @default(30)
+  status       AppointmentStatus @default(PENDING)
+  notes        String            @default("")
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user    User    @relation("Booker", fields: [userId], references: [id], onDelete: Cascade)
+  owner   User    @relation("Host", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, scheduledAt])
+  @@index([userId, scheduledAt])
+}
+
+model AutomationEvent {
+  id        String         @id @default(cuid())
+  type      AutomationType
+  title     String
+  detail    String
+  status    String         @default("IN_APP")
+  channel   String         @default("INBOX")
+  emailTo   String?
+  read      Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  user      User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    String?
+
+  @@index([userId, read])
+}
+
+model AiConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("New conversation")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  AiMessage[]
+}
+
+model AiMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  createdAt      DateTime @default(now())
+  conversation   AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
