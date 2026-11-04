@@ -16,8 +16,8 @@ export default function LoginPage(){
         <h1 className="font-display text-3xl font-semibold">Welcome back</h1>
         {state?.error&&<p className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{state.error}</p>}
         <div className="mt-6 grid gap-4">
-          <div><label className="label">Email</label><input name="email" type="email" className="input" required /></div>
-          <div><label className="label">Password</label><input name="password" type="password" className="input" required /></div>
+          <div><label htmlFor="login-email" className="label">Email</label><input id="login-email" name="email" type="email" autoComplete="email" maxLength={254} className="input" required /></div>
+          <div><label htmlFor="login-password" className="label">Password</label><input id="login-password" name="password" type="password" autoComplete="current-password" maxLength={72} className="input" required /></div>
         </div>
         <SubmitButton />
         <p className="mt-5 text-sm text-muted">New here? <Link href="/register" className="font-semibold text-brand">Create an account</Link></p>

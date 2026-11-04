@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { localAssistant } from "@/lib/ai";
 import { runAutomation } from "@/lib/automation";
+import { readJsonBody } from "@/lib/request";
 
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models";
@@ -13,10 +14,10 @@ export async function POST(request: Request) {
 
   const parsed = z
     .object({
-      message: z.string().min(1),
-      conversationId: z.string().optional(),
+      message: z.string().trim().min(1).max(2000),
+      conversationId: z.string().min(1).max(128).optional(),
     })
-    .safeParse(await request.json());
+    .safeParse(await readJsonBody(request));
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid message." }, { status: 400 });

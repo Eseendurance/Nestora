@@ -25,11 +25,11 @@ export default function SiteNav({user}:{user:SessionUser|null}){
             :<><Link href="/login" className="nav-link">Log in</Link><Link href="/register" className="btn-primary">Get started</Link></>}
         </nav>
 
-        <button className="btn-ghost lg:hidden" onClick={()=>setOpen(!open)}>Menu</button>
+        <button className="btn-ghost lg:hidden" aria-expanded={open} aria-controls="mobile-navigation" onClick={()=>setOpen(!open)}>Menu</button>
       </div>
 
       {open&&(
-        <div className="border-t border-[var(--line)] bg-white lg:hidden dark:bg-neutral-900">
+        <div id="mobile-navigation" className="border-t border-[var(--line)] bg-white lg:hidden dark:bg-neutral-900">
           <div className="container-page grid gap-1 py-4">
             {links.map(([href,label])=><Link key={href} href={href} className="nav-link" onClick={()=>setOpen(false)}>{label}</Link>)}
             {user&&<Link href="/dashboard" className="nav-link" onClick={()=>setOpen(false)}>Dashboard</Link>}

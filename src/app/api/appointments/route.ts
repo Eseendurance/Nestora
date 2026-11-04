@@ -3,12 +3,14 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireUser } from '@/lib/auth';
 import { runAutomation } from '@/lib/automation';
+import { readJsonBody } from '@/lib/request';
 
 export async function POST(request:Request){
   const user=await requireUser();
   const parsed=z.object({
-    listingId:z.string(),scheduledAt:z.string(),notes:z.string().max(500).optional()
-  }).safeParse(await request.json());
+    listingId:z.string().min(1).max(128),scheduledAt:z.string().min(1).max(64),
+    notes:z.string().trim().max(500).optional()
+  }).safeParse(await readJsonBody(request));
 
   if(!parsed.success) return NextResponse.json({error:'Invalid booking details.'},{status:400});
 

@@ -3,12 +3,14 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { runAutomation } from '@/lib/automation';
+import { readJsonBody } from '@/lib/request';
 
 export async function POST(request:Request,{params}:{params:Promise<{id:string}>}){
   const admin=await requireAdmin();
   const {id}=await params;
 
-  const parsed=z.object({body:z.string().min(2)}).safeParse(await request.json());
+  const parsed=z.object({body:z.string().trim().min(2).max(5000)})
+    .safeParse(await readJsonBody(request));
   if(!parsed.success) return NextResponse.json({error:'Reply is too short.'},{status:400});
 
   const message=await prisma.contactMessage.findUnique({where:{id}});

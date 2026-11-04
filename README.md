@@ -35,6 +35,8 @@ messages, creates notifications and records automation events.
 ```bash
 npm install
 cp .env.example .env
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+# Put the generated value in AUTH_SECRET in .env
 npx prisma db push
 npm run db:seed
 npm run dev
@@ -42,10 +44,8 @@ npm run dev
 
 Open http://localhost:3000
 
-## Seed accounts
-
-- Admin: admin@nestora.example / Admin12345!
-- Agent: agent@nestora.example / Agent12345!
+The seed command creates local demo accounts and sample data. It is disabled in
+production; do not use the local demo credentials on a deployed site.
 
 ## Gmail SMTP setup
 
@@ -77,23 +77,37 @@ MAIL_FROM="Nestora <verified@yourdomain.com>"
 
 The downloadable default uses SQLite for simple local self-hosting.
 
-For Vercel or a scalable production deployment, set `DATABASE_URL` to a
-PostgreSQL connection string in your deployment environment. The Vercel build
-automatically generates the PostgreSQL Prisma client. To create or update the
-database schema, run:
+### Neon on Vercel
+
+1. Create a Neon project and database. In Neon, copy the **pooled** connection
+   string into Vercel's `DATABASE_URL` environment variable. Use the pooled
+   hostname (it includes `-pooler`) and keep `sslmode=require`.
+2. Copy Neon's **direct, non-pooled** connection string into Vercel's
+   `DIRECT_URL` variable. Prisma uses this direct URL for schema changes.
+3. Set `AUTH_SECRET` to a cryptographically random value of at least 32
+   characters, and set `NEXT_PUBLIC_APP_URL` to the deployed HTTPS origin.
+   Apply these variables to Production and Preview as appropriate.
+4. With `DATABASE_URL` and `DIRECT_URL` set in your local environment, create
+   the database tables:
 
 ```bash
 npm run db:postgres
 ```
 
-The same `DATABASE_URL` must be available when running this command. The
-PostgreSQL schema is kept separate so local SQLite development remains unchanged.
+5. Redeploy on Vercel. Vercel selects the PostgreSQL Prisma schema automatically;
+   local development continues to use SQLite.
+6. Register through the site to create your first account. To grant that account
+   administrator access, run this statement in the Neon SQL Editor after
+   replacing the email with your account's address:
+
+```sql
+UPDATE "User" SET role = 'ADMIN' WHERE email = 'your-email@example.com';
+```
+
+Do not commit either Neon connection string or the auth secret. If the deployed
+site reports a server-side exception, check the Vercel Function Logs and confirm
+both database variables are set for the deployment's environment.
 
 ## Deploy
 
-1. Push to GitHub.
-2. Import into Vercel.
-3. Add `DATABASE_URL` (PostgreSQL), `AUTH_SECRET` (a long random secret), and
-   `NEXT_PUBLIC_APP_URL` (your deployed URL) to the Vercel project settings.
-4. Run `npm run db:postgres` against that database to create the tables.
-5. Deploy. Vercel uses the PostgreSQL Prisma schema automatically.
+See [Neon on Vercel](#neon-on-vercel) for database configuration.

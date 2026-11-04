@@ -3,14 +3,15 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { runAutomation } from '@/lib/automation';
+import { readJsonBody } from '@/lib/request';
 
 const schema=z.object({
-  name:z.string().min(2),email:z.string().email(),
-  subject:z.string().min(3),message:z.string().min(10)
+  name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(254),
+  subject:z.string().trim().min(3).max(150),message:z.string().trim().min(10).max(5000)
 });
 
 export async function POST(request:Request){
-  const parsed=schema.safeParse(await request.json());
+  const parsed=schema.safeParse(await readJsonBody(request));
   if(!parsed.success) return NextResponse.json({error:'Please provide valid details.'},{status:400});
 
   const user=await getSession();

@@ -4,6 +4,10 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === 'production' || process.env.DATABASE_URL?.startsWith('postgres')) {
+    throw new Error('Demo seeding is only available for local SQLite development.');
+  }
+
   const admin = await prisma.user.upsert({
     where: { email: 'admin@nestora.example' },
     update: {},
