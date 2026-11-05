@@ -107,15 +107,18 @@ The downloadable default uses SQLite for simple local self-hosting.
 3. Set `AUTH_SECRET` to a cryptographically random value of at least 32
    characters, and set `NEXT_PUBLIC_APP_URL` to the deployed HTTPS origin.
    Apply these variables to Production and Preview as appropriate.
-4. With `DATABASE_URL` and `DIRECT_URL` set in your local environment, create
-   the database tables:
+4. The Vercel build now applies the PostgreSQL Prisma schema with `prisma db push`
+   before building the app. Make sure `DATABASE_URL` and `DIRECT_URL` are set for
+   the Vercel deployment. To initialize or update the schema manually instead,
+   set both variables in your local environment and run:
 
 ```bash
 npm run db:postgres
 ```
 
-5. Redeploy on Vercel. Vercel uses `build:vercel`, which generates the
-   PostgreSQL Prisma Client; local development continues to use SQLite.
+5. Redeploy on Vercel. Its `build:vercel` script generates the PostgreSQL Prisma
+   Client, applies the schema (including any new tables), and then builds Next.js;
+   local development continues to use SQLite.
 6. Register through the site to create your first account. To grant that account
    administrator access, run this statement in the Neon SQL Editor after
    replacing the email with your account's address:
