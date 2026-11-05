@@ -97,20 +97,22 @@ MAIL_FROM="Nestora <verified@yourdomain.com>"
 
 The downloadable default uses SQLite for simple local self-hosting.
 
-### Neon on Vercel
+### Supabase on Vercel
 
-1. Create a Neon project and database. In Neon, copy the **pooled** connection
-   string into Vercel's `DATABASE_URL` environment variable. Use the pooled
-   hostname (it includes `-pooler`) and keep `sslmode=require`.
-2. Copy Neon's **direct, non-pooled** connection string into Vercel's
-   `DIRECT_URL` variable. Prisma uses this direct URL for schema changes.
+1. Create a Supabase project and database. In the Supabase dashboard, open
+   **Connect** and copy the **Transaction pooler** connection string (port `6543`)
+   into Vercel's `DATABASE_URL` environment variable. Add
+   `pgbouncer=true` to its query string if it is not already present.
+2. Copy the **Session pooler** connection string (port `5432`) into Vercel's
+   `DIRECT_URL` variable. Prisma uses it to apply schema changes during deployment.
+   Use the connection strings provided by Supabase so the project reference,
+   region, username, password, and SSL options match your project.
 3. Set `AUTH_SECRET` to a cryptographically random value of at least 32
    characters, and set `NEXT_PUBLIC_APP_URL` to the deployed HTTPS origin.
-   Apply these variables to Production and Preview as appropriate.
-4. The Vercel build now applies the PostgreSQL Prisma schema with `prisma db push`
-   before building the app. Make sure `DATABASE_URL` and `DIRECT_URL` are set for
-   the Vercel deployment. To initialize or update the schema manually instead,
-   set both variables in your local environment and run:
+   Add these variables to both Preview and Production in Vercel.
+4. The Vercel build applies the PostgreSQL Prisma schema with `prisma db push`
+   before building the app. To initialize or update the schema manually instead,
+   set both database variables in your local environment and run:
 
 ```bash
 npm run db:postgres
@@ -120,17 +122,18 @@ npm run db:postgres
    Client, applies the schema (including any new tables), and then builds Next.js;
    local development continues to use SQLite.
 6. Register through the site to create your first account. To grant that account
-   administrator access, run this statement in the Neon SQL Editor after
+   administrator access, run this statement in the Supabase SQL Editor after
    replacing the email with your account's address:
 
 ```sql
 UPDATE "User" SET role = 'ADMIN' WHERE email = 'your-email@example.com';
 ```
 
-Do not commit either Neon connection string or the auth secret. If the deployed
+The Supabase database starts fresh; existing database data is not migrated.
+Do not commit either Supabase connection string or the auth secret. If the deployed
 site reports a server-side exception, check the Vercel Function Logs and confirm
 both database variables are set for the deployment's environment.
 
 ## Deploy
 
-See [Neon on Vercel](#neon-on-vercel) for database configuration.
+See [Supabase on Vercel](#supabase-on-vercel) for database configuration.
