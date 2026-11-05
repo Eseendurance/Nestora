@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { runAutomation } from '@/lib/automation';
 import { readJsonBody } from '@/lib/request';
+import { captureLead } from '@/lib/leads';
 
 const schema=z.object({
   name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(254),
@@ -26,6 +27,14 @@ export async function POST(request:Request){
   });
 
   const admins=await prisma.user.findMany({where:{role:'ADMIN'}});
+  const firstAdmin=admins[0];
+  if(firstAdmin){
+    await prisma.$transaction(tx=>captureLead(tx,{
+      assignedToId:firstAdmin.id,name:message.name,email:message.email,
+      message:`${message.subject}\n\n${message.message}`,source:'CONTACT_FORM',
+      activityUserId:user?.id??firstAdmin.id,activity:'Website contact form submitted.'
+    }));
+  }
   await Promise.all(admins.map(admin=>runAutomation({
     type:'CONTACT_FORM',title:'New support request',
     detail:`${message.name} (${message.email}): ${message.subject}`,

@@ -17,20 +17,60 @@ model User {
   updatedAt    DateTime @updatedAt
 
   listings        Listing[]
+  ownedOrganizations Organization[] @relation("OrganizationOwner")
+  organizationMemberships OrganizationMember[]
   savedListings   SavedListing[]
   inquiries       Inquiry[]        @relation("Inquirer")
   received        Inquiry[]        @relation("Receiver")
+  assignedLeads   Lead[]           @relation("AssignedLeads")
+  leadActivities  LeadActivity[]   @relation("LeadActivityAuthor")
   contactMessages ContactMessage[]
   contactReplies  ContactReply[]
   appointments    Appointment[]    @relation("Booker")
   hosted          Appointment[]    @relation("Host")
+  availability    AvailabilityRule[]
   automations     AutomationEvent[]
   aiConversations AiConversation[]
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @default("")
+  website     String?
+  industry    String   @default("REAL_ESTATE")
+  plan        String   @default("FREE")
+  status      String   @default("ACTIVE")
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner   User                 @relation("OrganizationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members OrganizationMember[]
+  listings Listing[]
+  leads    Lead[]
+
+  @@index([ownerId])
+}
+
+model OrganizationMember {
+  organizationId String
+  userId         String
+  role           String   @default("AGENT")
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([organizationId, userId])
+  @@index([userId])
 }
 
 model Listing {
   id           String        @id @default(cuid())
   userId       String
+  organizationId String?
   title        String
   slug         String        @unique
   propertyType String
@@ -53,15 +93,18 @@ model Listing {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  savedBy     SavedListing[]
-  inquiries   Inquiry[]
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization?  @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  savedBy      SavedListing[]
+  inquiries    Inquiry[]
   appointments Appointment[]
+  leads        Lead[]
 
   @@index([city])
   @@index([price])
   @@index([status])
   @@index([createdAt])
+  @@index([organizationId])
 }
 
 model SavedListing {
@@ -85,6 +128,45 @@ model Inquiry {
   user      User     @relation("Inquirer", fields: [userId], references: [id], onDelete: Cascade)
   owner     User     @relation("Receiver", fields: [ownerId], references: [id], onDelete: Cascade)
   @@index([ownerId])
+}
+
+model Lead {
+  id             String   @id @default(cuid())
+  organizationId String?
+  assignedToId   String
+  listingId      String?
+  name           String
+  email          String
+  phone          String?
+  message        String
+  source         String   @default("PROPERTY_ENQUIRY")
+  status         String   @default("NEW")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  assignedTo   User          @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: Cascade)
+  listing      Listing?      @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  activities   LeadActivity[]
+
+  @@index([organizationId, status, createdAt])
+  @@index([assignedToId, status, createdAt])
+  @@index([listingId])
+  @@unique([listingId, email])
+}
+
+model LeadActivity {
+  id        String   @id @default(cuid())
+  leadId    String
+  userId    String?
+  kind      String   @default("NOTE")
+  body      String
+  createdAt DateTime @default(now())
+
+  lead Lead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user User? @relation("LeadActivityAuthor", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([leadId, createdAt])
 }
 
 model ContactMessage {
@@ -129,6 +211,24 @@ model Appointment {
 
   @@index([ownerId, scheduledAt])
   @@index([userId, scheduledAt])
+}
+
+model AvailabilityRule {
+  id                String   @id @default(cuid())
+  userId            String
+  dayOfWeek         Int
+  isAvailable       Boolean  @default(true)
+  startMinutes      Int
+  endMinutes        Int
+  timeZone          String   @default("Africa/Lagos")
+  bufferMinutes     Int      @default(15)
+  maxBookingsPerDay Int      @default(8)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dayOfWeek])
 }
 
 model AutomationEvent {

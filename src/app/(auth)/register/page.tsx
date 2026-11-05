@@ -1,15 +1,21 @@
 'use client';
 import Link from 'next/link';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState } from 'react';
 import { registerAction } from '../actions';
 
-function SubmitButton(){
-  const {pending}=useFormStatus();
+function SubmitButton({pending}:{pending:boolean}){
   return <button disabled={pending} className="btn-primary mt-6 w-full">{pending?'Creating account…':'Create account'}</button>;
 }
 
 export default function RegisterPage(){
-  const [state,action]=useFormState(registerAction,{});
+  const [state,setState]=useState<{error?:string}>({});
+  const [pending,setPending]=useState(false);
+  async function action(formData:FormData){
+    setPending(true);
+    setState({});
+    setState(await registerAction({},formData));
+    setPending(false);
+  }
   return (
     <section className="section"><div className="container-page flex justify-center">
       <form action={action} className="card w-full max-w-md">
@@ -21,7 +27,7 @@ export default function RegisterPage(){
           <div><label htmlFor="register-password" className="label">Password</label><input id="register-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} className="input" required /></div>
           <div><label htmlFor="register-role" className="label">I am a</label><select id="register-role" name="role" className="input"><option value="SEEKER">Home seeker</option><option value="AGENT">Agent / landlord</option></select></div>
         </div>
-        <SubmitButton />
+        <SubmitButton pending={pending} />
         <p className="mt-5 text-sm text-muted">Already registered? <Link href="/login" className="font-semibold text-brand">Log in</Link></p>
       </form>
     </div></section>

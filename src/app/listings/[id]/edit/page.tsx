@@ -8,10 +8,20 @@ export default async function EditListingPage({params}:{params:Promise<{id:strin
   const user=await requireUser();
   const {id}=await params;
   const listing=await prisma.listing.findUnique({where:{id}});
-  if(!listing||(listing.userId!==user.id&&user.role!=='ADMIN')) notFound();
+  if(!listing)notFound();
+  const [memberships,listingMembership]=await Promise.all([
+    prisma.organizationMember.findMany({
+      where:{userId:user.id,role:{in:['OWNER','ADMIN','MANAGER','AGENT']}},
+      include:{organization:{select:{id:true,name:true}}}
+    }),
+    listing.organizationId?prisma.organizationMember.findUnique({
+      where:{organizationId_userId:{organizationId:listing.organizationId,userId:user.id},role:{in:['OWNER','ADMIN','MANAGER','AGENT']}}
+    }):null
+  ]);
+  if(listing.userId!==user.id&&user.role!=='ADMIN'&&!listingMembership)notFound();
 
   return <section className="section"><div className="container-page">
     <h1 className="font-display text-4xl font-semibold">Edit listing</h1>
-    <ListingForm mode="edit" listing={listing} />
+    <ListingForm mode="edit" listing={listing} organizations={memberships.map(({organization})=>organization)} />
   </div></section>;
 }

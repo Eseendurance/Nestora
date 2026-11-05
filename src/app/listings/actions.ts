@@ -8,6 +8,7 @@ import { runAutomation } from '@/lib/automation';
 import { slugify } from '@/lib/ai';
 
 const schema=z.object({
+  organizationId:z.string().optional(),
   title:z.string().min(5),propertyType:z.string(),listingType:z.enum(['RENT','SALE']),
   price:z.coerce.number().positive(),bedrooms:z.coerce.number().int().min(0),
   bathrooms:z.coerce.number().int().min(0),areaSqm:z.coerce.number().int().min(0),
@@ -19,6 +20,7 @@ const schema=z.object({
 
 function parse(fd:FormData){
   return schema.safeParse({title:fd.get('title'),propertyType:fd.get('propertyType'),
+    organizationId:fd.get('organizationId')||undefined,
     listingType:fd.get('listingType'),price:fd.get('price'),bedrooms:fd.get('bedrooms'),
     bathrooms:fd.get('bathrooms'),areaSqm:fd.get('areaSqm'),city:fd.get('city'),
     neighborhood:fd.get('neighborhood'),address:fd.get('address'),description:fd.get('description'),
@@ -27,12 +29,27 @@ function parse(fd:FormData){
     status:fd.get('status')||undefined});
 }
 
+async function canManageOrganization(organizationId:string,userId:string){
+  const membership=await prisma.organizationMember.findUnique({
+    where:{organizationId_userId:{organizationId,userId}}
+  });
+  return membership&&['OWNER','ADMIN','MANAGER','AGENT'].includes(membership.role);
+}
+
+async function canManageListing(userId:string,role:string,listing:{userId:string;organizationId:string|null}){
+  if(listing.userId===userId||role==='ADMIN')return true;
+  return listing.organizationId?Boolean(await canManageOrganization(listing.organizationId,userId)):false;
+}
+
 export async function createListing(fd:FormData){
   const user=await requireUser();
   const parsed=parse(fd);
   if(!parsed.success)return;
 
-  const listing=await prisma.listing.create({data:{...parsed.data,userId:user.id,
+  const {organizationId,...listingData}=parsed.data;
+  const workspaceId=organizationId||null;
+  if(workspaceId&&!await canManageOrganization(workspaceId,user.id))return;
+  const listing=await prisma.listing.create({data:{...listingData,organizationId:workspaceId,userId:user.id,
     slug:`${slugify(parsed.data.title)}-${Date.now()}`,imageUrl:parsed.data.imageUrl||null,status:'PUBLISHED'}});
 
   await runAutomation({type:'LISTING_PUBLISHED',title:'Listing published',
@@ -47,12 +64,15 @@ export async function updateListing(fd:FormData){
   const user=await requireUser();
   const id=String(fd.get('id'));
   const listing=await prisma.listing.findUnique({where:{id}});
-  if(!listing||(listing.userId!==user.id&&user.role!=='ADMIN'))return;
+  if(!listing||!await canManageListing(user.id,user.role,listing))return;
 
   const parsed=parse(fd);
   if(!parsed.success)return;
 
-  await prisma.listing.update({where:{id},data:{...parsed.data,imageUrl:parsed.data.imageUrl||null}});
+  const {organizationId,...listingData}=parsed.data;
+  const workspaceId=organizationId||null;
+  if(workspaceId&&!await canManageOrganization(workspaceId,user.id))return;
+  await prisma.listing.update({where:{id},data:{...listingData,organizationId:workspaceId,imageUrl:parsed.data.imageUrl||null}});
   revalidatePath('/');revalidatePath('/listings');revalidatePath(`/listings/${id}`);revalidatePath('/dashboard');
   redirect(`/listings/${id}`);
 }
@@ -61,7 +81,7 @@ export async function deleteListing(fd:FormData){
   const user=await requireUser();
   const id=String(fd.get('id'));
   const listing=await prisma.listing.findUnique({where:{id}});
-  if(!listing||(listing.userId!==user.id&&user.role!=='ADMIN'))return;
+  if(!listing||!await canManageListing(user.id,user.role,listing))return;
 
   await prisma.listing.delete({where:{id}});
   revalidatePath('/');revalidatePath('/listings');revalidatePath('/dashboard');revalidatePath('/admin');

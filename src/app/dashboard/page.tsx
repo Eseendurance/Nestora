@@ -9,9 +9,19 @@ export const dynamic='force-dynamic';
 
 export default async function DashboardPage(){
   const user=await requireUser();
+  const memberships=await prisma.organizationMember.findMany({
+    where:{userId:user.id},select:{organizationId:true,role:true}
+  });
+  const organizationIds=memberships.map(({organizationId})=>organizationId);
+  const manageableOrganizationIds=memberships
+    .filter(({role})=>['OWNER','ADMIN','MANAGER','AGENT'].includes(role))
+    .map(({organizationId})=>organizationId);
 
   const [listings,saved,inquiries,notifications,appointments,conversation]=await Promise.all([
-    prisma.listing.findMany({where:{userId:user.id},orderBy:{createdAt:'desc'}}),
+    prisma.listing.findMany({where:{OR:[
+      {userId:user.id},
+      ...(organizationIds.length? [{organizationId:{in:organizationIds}}]:[])
+    ]},orderBy:{createdAt:'desc'}}),
     prisma.savedListing.findMany({where:{userId:user.id},include:{listing:true},orderBy:{createdAt:'desc'}}),
     prisma.inquiry.findMany({where:{ownerId:user.id},include:{listing:true,user:true},orderBy:{createdAt:'desc'}}),
     prisma.automationEvent.findMany({where:{userId:user.id},orderBy:{createdAt:'desc'},take:30}),
@@ -32,6 +42,11 @@ export default async function DashboardPage(){
             <p className="mt-2 text-muted">Your properties, bookings, inbox and AI workspace.</p>
           </div>
           <Link href="/listings/new" className="btn-primary">Create listing</Link>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link href="/dashboard/workspaces" className="btn-ghost">Workspaces and team</Link>
+          <Link href="/dashboard/leads" className="btn-ghost">Lead CRM</Link>
+          <Link href="/dashboard/availability" className="btn-ghost">Manage viewing availability</Link>
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -60,14 +75,15 @@ export default async function DashboardPage(){
             {listings.map(listing=>(
               <div key={listing.id} className="space-y-3">
                 <PropertyCard listing={listing} />
-                <div className="flex gap-3">
-                  <Link href={`/listings/${listing.id}/edit`} className="btn-ghost flex-1">Edit</Link>
-                  <form action={async(fd:FormData)=>{ 'use server';
-                    const {deleteListing}=await import('@/app/listings/actions'); await deleteListing(fd); }}>
-                    <input type="hidden" name="id" value={listing.id} />
-                    <button className="btn-danger">Delete</button>
-                  </form>
-                </div>
+                {(listing.userId===user.id||user.role==='ADMIN'||(listing.organizationId!==null&&manageableOrganizationIds.includes(listing.organizationId)))&&
+                  <div className="flex gap-3">
+                    <Link href={`/listings/${listing.id}/edit`} className="btn-ghost flex-1">Edit</Link>
+                    <form action={async(fd:FormData)=>{ 'use server';
+                      const {deleteListing}=await import('@/app/listings/actions'); await deleteListing(fd); }}>
+                      <input type="hidden" name="id" value={listing.id} />
+                      <button className="btn-danger">Delete</button>
+                    </form>
+                  </div>}
               </div>
             ))}
           </div>

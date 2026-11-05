@@ -1,4 +1,7 @@
+import path from 'node:path';
+
 const nextConfig={
+  outputFileTracingRoot:path.resolve(process.cwd()),
   images:{remotePatterns:[{protocol:'https',hostname:'**'}]},
   async headers(){
     return [{

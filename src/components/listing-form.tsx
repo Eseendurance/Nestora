@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { createListing,updateListing } from '@/app/listings/actions';
 import type { Listing } from '@prisma/client';
 
-export default function ListingForm({mode,listing}:{mode:'create'|'edit';listing?:Listing}){
+export default function ListingForm({mode,listing,organizations=[]}:{mode:'create'|'edit';listing?:Listing;organizations?:{id:string;name:string}[]}){
   const [description,setDescription]=useState(listing?.description??'');
   const [loading,setLoading]=useState(false);
 
@@ -20,6 +20,9 @@ export default function ListingForm({mode,listing}:{mode:'create'|'edit';listing
     <form action={mode==='create'?createListing:updateListing} className="card mt-10">
       {listing&&<input type="hidden" name="id" value={listing.id} />}
       <div className="grid gap-5 md:grid-cols-2">
+        {organizations.length>0&&<div className="space-y-1 md:col-span-2"><label className="label">Workspace</label>
+          <select name="organizationId" defaultValue={listing?.organizationId??''} className="input"><option value="">Personal listing</option>
+            {organizations.map(organization=><option key={organization.id} value={organization.id}>{organization.name}</option>)}</select></div>}
         <div className="space-y-1 md:col-span-2"><label className="label">Title</label><input name="title" defaultValue={listing?.title} className="input" required /></div>
         <div className="space-y-1"><label className="label">Property type</label><select name="propertyType" defaultValue={listing?.propertyType} className="input"><option>Apartment</option><option>House</option><option>Duplex</option><option>Studio</option><option>Townhouse</option></select></div>
         <div className="space-y-1"><label className="label">Listing type</label><select name="listingType" defaultValue={listing?.listingType} className="input"><option value="RENT">For rent</option><option value="SALE">For sale</option></select></div>

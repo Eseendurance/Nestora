@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireUser } from '@/lib/auth';
 import { runAutomation } from '@/lib/automation';
+import { captureLead } from '@/lib/leads';
 
 export async function toggleSavedListing(listingId:string){
   const user=await requireUser();
@@ -28,7 +29,14 @@ export async function createInquiry(formData:FormData){
   });
   if(!listing)return;
 
-  await prisma.inquiry.create({data:{listingId:listing.id,userId:user.id,ownerId:listing.userId,message:parsed.data.message}});
+  await prisma.$transaction(async tx=>{
+    await tx.inquiry.create({data:{listingId:listing.id,userId:user.id,ownerId:listing.userId,message:parsed.data.message}});
+    await captureLead(tx,{
+      organizationId:listing.organizationId,assignedToId:listing.userId,listingId:listing.id,
+      name:user.fullName,email:user.email,message:parsed.data.message,source:'PROPERTY_ENQUIRY',
+      activityUserId:user.id,activity:`Property enquiry sent for ${listing.title}.`
+    });
+  });
 
   await runAutomation({type:'INQUIRY_CREATED',title:`Enquiry sent: ${listing.title}`,
     detail:'Your enquiry was delivered to the property owner.',userId:user.id,
