@@ -75,7 +75,7 @@ export function AddWorkspaceMember({ organizationId }: { organizationId: string 
       </select>
       <button className="btn-primary">Add member</button>
       <div className="sm:col-span-3"><ActionMessage {...state} /></div>
-      <p className="text-xs text-muted sm:col-span-3">The person must already have a Nestora account. You can change or remove their role at any time.</p>
+      <p className="text-xs text-muted sm:col-span-3">The person must already have a Crestline account. You can change or remove their role at any time.</p>
     </form>
   );
 }

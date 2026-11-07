@@ -7,7 +7,7 @@ export default function PropertyCard({listing,matchScore}:{listing:Listing;match
       <div className="relative aspect-[16/10] bg-gradient-to-br from-emerald-100 to-amber-50 dark:from-neutral-800 dark:to-neutral-800">
         {listing.imageUrl
           ?<img src={listing.imageUrl} alt={listing.title} className="size-full object-cover" />
-          :<div className="grid size-full place-items-center text-sm text-muted">Nestora property</div>}
+          :<div className="grid size-full place-items-center text-sm text-muted">Crestline property</div>}
         {listing.featured&&<span className="absolute left-4 top-4 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white">Featured</span>}
         {typeof matchScore==='number'&&<span className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-brand">{matchScore}% match</span>}
       </div>

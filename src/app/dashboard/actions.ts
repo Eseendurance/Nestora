@@ -21,7 +21,7 @@ export async function updateAppointment(formData:FormData){
     title:`Viewing ${status.toLowerCase()}: ${appointment.listing.title}`,
     detail:`Your viewing on ${appointment.scheduledAt.toLocaleString()} was ${status.toLowerCase()}.`,
     userId:appointment.userId,emailTo:appointment.user.email,
-    emailSubject:'Nestora viewing update'});
+    emailSubject:'Crestline viewing update'});
 
   revalidatePath('/dashboard');
 }

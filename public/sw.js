@@ -1,4 +1,4 @@
-const CACHE='nestora-v1';
+const CACHE='crestline-v1';
 const ASSETS=['/','/offline','/manifest.webmanifest','/icon.svg'];
 
 self.addEventListener('install',e=>{

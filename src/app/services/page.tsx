@@ -11,8 +11,8 @@ export default function ServicesPage(){
 
   return (
     <section className="section"><div className="container-page">
-      <span className="eyebrow">What Nestora does</span>
-      <h1 className="mt-6 font-display text-4xl font-semibold md:text-6xl">A complete property operating system</h1>
+      <span className="eyebrow">What Crestline does</span>
+      <h1 className="mt-6 font-display text-4xl font-semibold md:text-6xl">A complete property and infrastructure operating system</h1>
       <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {services.map(([t,c])=><div key={t} className="card"><h2 className="font-display text-xl font-semibold">{t}</h2><p className="mt-2 text-muted">{c}</p></div>)}
       </div>

@@ -53,8 +53,8 @@ export async function createListing(fd:FormData){
     slug:`${slugify(parsed.data.title)}-${Date.now()}`,imageUrl:parsed.data.imageUrl||null,status:'PUBLISHED'}});
 
   await runAutomation({type:'LISTING_PUBLISHED',title:'Listing published',
-    detail:`“${listing.title}” is now live on Nestora.`,userId:user.id,
-    emailTo:user.email,emailSubject:'Your Nestora listing is live'});
+    detail:`“${listing.title}” is now live on Crestline.`,userId:user.id,
+    emailTo:user.email,emailSubject:'Your Crestline listing is live'});
 
   revalidatePath('/');revalidatePath('/listings');revalidatePath('/dashboard');
   redirect(`/listings/${listing.id}`);

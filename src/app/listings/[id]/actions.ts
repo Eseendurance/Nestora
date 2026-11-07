@@ -40,11 +40,11 @@ export async function createInquiry(formData:FormData){
 
   await runAutomation({type:'INQUIRY_CREATED',title:`Enquiry sent: ${listing.title}`,
     detail:'Your enquiry was delivered to the property owner.',userId:user.id,
-    emailTo:user.email,emailSubject:'Your Nestora enquiry was received'});
+    emailTo:user.email,emailSubject:'Your Crestline enquiry was received'});
 
   await runAutomation({type:'INQUIRY_CREATED',title:`New enquiry: ${listing.title}`,
     detail:`${user.fullName} sent an enquiry about your property.`,userId:listing.userId,
-    emailTo:listing.user?.email,emailSubject:'New Nestora property enquiry'});
+    emailTo:listing.user?.email,emailSubject:'New Crestline property enquiry'});
 
   revalidatePath(`/listings/${listing.id}`);
   revalidatePath('/dashboard');

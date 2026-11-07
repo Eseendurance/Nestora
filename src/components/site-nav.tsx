@@ -12,8 +12,8 @@ export default function SiteNav({user}:{user:SessionUser|null}){
     <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-paper/90 backdrop-blur-xl dark:bg-neutral-950/90">
       <div className="container-page flex items-center justify-between py-4">
         <Link href="/" className="flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-xl bg-brand font-bold text-white dark:bg-emerald-500 dark:text-emerald-950">N</span>
-          <span className="font-display text-xl font-semibold">Nestora</span>
+          <span className="grid size-9 place-items-center rounded-xl bg-brand font-bold text-white dark:bg-emerald-500 dark:text-emerald-950">C</span>
+          <span className="font-display text-xl font-semibold">Crestline</span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">

@@ -144,7 +144,7 @@ export default async function LeadsPage({
                       {lead.activities.map((activity) => (
                         <li key={activity.id} className="text-sm">
                           <p>{activity.body}</p>
-                          <p className="mt-1 text-xs text-muted">{activity.user?.fullName ?? 'Nestora'} · {activity.createdAt.toLocaleString()}</p>
+                          <p className="mt-1 text-xs text-muted">{activity.user?.fullName ?? 'Crestline'} · {activity.createdAt.toLocaleString()}</p>
                         </li>
                       ))}
                     </ol>

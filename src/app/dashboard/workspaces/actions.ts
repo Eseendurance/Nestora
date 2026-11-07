@@ -83,7 +83,7 @@ export async function addOrganizationMember(_state: ActionState, formData: FormD
     where: { email: parsed.data.email.toLowerCase() },
     select: { id: true }
   });
-  if (!member) return { error: 'That user must create a Nestora account before joining a workspace.' };
+  if (!member) return { error: 'That user must create a Crestline account before joining a workspace.' };
   if (member.id === organization.ownerId) return { error: 'The workspace owner is already a member.' };
 
   await prisma.organizationMember.upsert({

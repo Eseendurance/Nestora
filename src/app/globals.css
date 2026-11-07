@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{--line:#e4e1d8}
+:root{--line:#e4e1d8;--font-display:"Georgia","Times New Roman",serif;--font-body:"Segoe UI",system-ui,-apple-system,sans-serif}
 .dark{--line:#26332d}
 
-body{background:theme('colors.paper');color:theme('colors.ink');-webkit-font-smoothing:antialiased}
+body{background:theme('colors.paper');color:theme('colors.ink');font-family:var(--font-body);-webkit-font-smoothing:antialiased}
 .dark body{background:#0d1411;color:#e8efea}
 
 @layer components{

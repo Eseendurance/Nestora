@@ -23,7 +23,7 @@ export async function POST(request:Request){
   await runAutomation({
     type:'CONTACT_FORM',title:`Support request: ${message.subject}`,
     detail:`${message.name} submitted a support request. Open the admin inbox to respond.`,
-    userId:user?.id,emailTo:message.email,emailSubject:'We received your Nestora message'
+    userId:user?.id,emailTo:message.email,emailSubject:'We received your Crestline message'
   });
 
   const admins=await prisma.user.findMany({where:{role:'ADMIN'}});
@@ -38,11 +38,11 @@ export async function POST(request:Request){
   await Promise.all(admins.map(admin=>runAutomation({
     type:'CONTACT_FORM',title:'New support request',
     detail:`${message.name} (${message.email}): ${message.subject}`,
-    userId:admin.id,emailTo:admin.email,emailSubject:'New Nestora support request'
+    userId:admin.id,emailTo:admin.email,emailSubject:'New Crestline support request'
   })));
 
   return NextResponse.json({
     ok:true,id:message.id,
-    message:'Your request has been received. If you are signed in, updates will appear in your Nestora inbox.'
+    message:'Your request has been received. If you are signed in, updates will appear in your Crestline inbox.'
   });
 }

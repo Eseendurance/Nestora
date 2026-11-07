@@ -32,7 +32,7 @@ export default async function ListingPage({params,searchParams}:{params:Promise<
 
         <div className="mt-8 aspect-[16/9] overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-100 to-amber-50 dark:from-neutral-800 dark:to-neutral-800">
           {listing.imageUrl?<img src={listing.imageUrl} alt={listing.title} className="size-full object-cover" />
-            :<div className="grid size-full place-items-center text-muted">Nestora property</div>}
+            :<div className="grid size-full place-items-center text-muted">Crestline property</div>}
         </div>
 
         <h2 className="mt-10 font-display text-2xl font-semibold">About this home</h2>

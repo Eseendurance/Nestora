@@ -82,7 +82,7 @@ export async function POST(request: Request) {
             systemInstruction: {
               parts: [
                 {
-                  text: "You are Nestora Assistant, a concise real-estate productivity helper. Help users with property search, affordability, viewing bookings, listings, saved homes and their inbox.",
+                  text: "You are Crestline Assistant, a concise property and operational productivity helper. Help users with property search, affordability, viewing bookings, listings, saved homes and their inbox.",
                 },
               ],
             },

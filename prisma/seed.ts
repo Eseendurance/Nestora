@@ -11,7 +11,7 @@ async function main() {
   const admin = await prisma.user.upsert({
     where: { email: 'admin@nestora.example' },
     update: {},
-    create: { fullName:'Nestora Admin', email:'admin@nestora.example',
+    create: { fullName:'Crestline Admin', email:'admin@crestline.example',
       passwordHash: await bcrypt.hash('Admin12345!',12), role:'ADMIN' }
   });
 
@@ -36,7 +36,7 @@ async function main() {
   }
 
   await prisma.automationEvent.create({ data:{
-    type:'CONTACT_FORM', title:'Welcome to Nestora',
+    type:'CONTACT_FORM', title:'Welcome to Crestline',
     detail:'Your built-in inbox is ready. Property alerts, enquiries and appointment updates will appear here.',
     userId:admin.id }});
 }

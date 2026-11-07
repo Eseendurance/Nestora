@@ -91,7 +91,7 @@ export default function DashboardInbox({notifications,appointments,conversation}
 
       {tab==='ai'&&(
         <div className="mt-6">
-          <h3 className="font-display text-xl font-semibold">Nestora Assistant</h3>
+          <h3 className="font-display text-xl font-semibold">Crestline Assistant</h3>
           <p className="mt-1 text-sm text-muted">Ask about affordability, bookings, listings or your inbox.</p>
 
           <div className="mt-4 max-h-80 space-y-3 overflow-y-auto rounded-xl border border-[var(--line)] p-4">
@@ -106,7 +106,7 @@ export default function DashboardInbox({notifications,appointments,conversation}
 
           <div className="mt-4 flex gap-3">
             <input value={input} onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>e.key==='Enter'&&send()} className="input" placeholder="Ask Nestora Assistant…" />
+              onKeyDown={e=>e.key==='Enter'&&send()} className="input" placeholder="Ask Crestline Assistant…" />
             <button onClick={send} className="btn-primary">Send</button>
           </div>
         </div>

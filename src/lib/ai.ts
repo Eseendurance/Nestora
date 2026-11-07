@@ -52,7 +52,7 @@ export function localAssistant(message:string,context:{name:string;unread:number
     return `You can book a viewing from any property page. Choose a date and time, submit the request, and the property owner will confirm or decline it. You currently have ${context.appointments} appointment(s).`;
 
   if(q.includes('budget')||q.includes('afford'))
-    return 'Use the affordability checker on a property page. Nestora applies a conservative guideline of keeping housing below 30% of monthly income.';
+    return 'Use the affordability checker on a property page. Crestline applies a conservative guideline of keeping housing below 30% of monthly income.';
 
   if(q.includes('save')||q.includes('favourite'))
     return `You have ${context.saved} saved home(s). Open any property and select “Save home” to add it to your shortlist.`;

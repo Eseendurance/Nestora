@@ -5,8 +5,8 @@ export default function AboutPage(){
   return (
     <section className="section"><div className="container-page">
       <span className="eyebrow">Our mission</span>
-      <h1 className="mt-6 font-display text-4xl font-semibold md:text-6xl">Housing decisions deserve better tools.</h1>
-      <p className="mt-6 max-w-2xl text-muted">Nestora reduces friction in property search with clear listings, affordability context, appointment booking, a built-in inbox and AI assistance.</p>
+      <h1 className="mt-6 font-display text-4xl font-semibold md:text-6xl">Better decisions need sharper information and cleaner execution.</h1>
+      <p className="mt-6 max-w-2xl text-muted">Crestline reduces friction in property search and operational decision-making with clear listings, affordability context, appointment booking, a built-in inbox, and executive-grade intelligence.</p>
       <div className="mt-12 grid gap-6 md:grid-cols-3">
         {['For home seekers','For agents','For operators'].map((t,i)=>(
           <div key={t} className="card"><h2 className="font-display text-xl font-semibold">{t}</h2>

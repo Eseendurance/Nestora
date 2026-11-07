@@ -212,7 +212,7 @@ export async function POST(request: Request) {
     detail: `${user.fullName} requested a viewing on ${when.toLocaleString()}.`,
     userId: user.id,
     emailTo: user.email,
-    emailSubject: 'Your Nestora viewing request'
+    emailSubject: 'Your Crestline viewing request'
   });
 
   await runAutomation({
@@ -221,7 +221,7 @@ export async function POST(request: Request) {
     detail: `${user.fullName} requested ${when.toLocaleString()}.`,
     userId: listing.userId,
     emailTo: listing.user?.email ?? undefined,
-    emailSubject: 'New Nestora viewing request'
+    emailSubject: 'New Crestline viewing request'
   });
 
   return NextResponse.json({ ok: true, appointment });

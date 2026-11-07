@@ -23,9 +23,9 @@ export default async function HomePage({searchParams}:{searchParams:Promise<{q?:
     <>
       <section className="section">
         <div className="container-page">
-          <span className="eyebrow">AI-assisted property discovery</span>
-          <h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.05] md:text-7xl">Find a home that fits your real life.</h1>
-          <p className="mt-5 max-w-xl text-muted">Nestora combines property search, affordability insight, appointment booking, a built-in inbox and AI assistance.</p>
+          <span className="eyebrow">Enterprise property intelligence</span>
+          <h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.05] md:text-7xl">Discover premium opportunities with infrastructure-grade clarity.</h1>
+          <p className="mt-5 max-w-xl text-muted">Crestline combines property discovery, affordability insight, appointment booking, a built-in inbox, and executive-ready intelligence for modern buyers, agents, and operators.</p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link href="/listings" className="btn-primary">Browse properties</Link>
             <Link href="/services" className="btn-ghost">Explore services</Link>

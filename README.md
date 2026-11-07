@@ -1,12 +1,12 @@
-# Nestora v3 — Self-hosted Intelligent Property Platform
+# Crestline — Intelligent Property & Infrastructure Platform
 
-Nestora is a full-stack Next.js real-estate platform with a built-in inbox,
-appointment booking, AI assistant, property marketplace, admin workspace, dark mode
-and optional PWA support.
+Crestline is a full-stack Next.js platform that brings together premium property
+search, operational intelligence, appointment booking, AI assistance, and an
+enterprise-ready workspace for modern buyers, agents, and operators.
 
 ## Email without monthly fees
 
-Nestora uses a built-in inbox as the default notification channel.
+Crestline uses a built-in inbox as the default notification channel.
 
 Optional external email is supported through your own SMTP account:
 
@@ -14,7 +14,7 @@ Optional external email is supported through your own SMTP account:
 - SendGrid SMTP: use `smtp.sendgrid.net`, port `587`, with your SendGrid username/API key
 - Any SMTP provider you already pay for or use free
 
-If SMTP variables are blank, Nestora does not send external email. It still stores
+If SMTP variables are blank, Crestline does not send external email. It still stores
 messages, creates notifications and records automation events.
 
 ## Built-in systems
@@ -37,7 +37,7 @@ messages, creates notifications and records automation events.
 ## Workspaces, CRM, and viewing availability
 
 Sign in and open **Dashboard → Workspaces and team** to create a company workspace.
-Workspace owners and admins can add existing Nestora users and manage their roles.
+Workspace owners and admins can add existing Crestline users and manage their roles.
 Listings can be assigned to a workspace when they are created or edited. Workspace
 members see its leads in **Open team CRM**, where they can update pipeline status,
 assign leads to teammates, and keep an activity timeline.
@@ -79,7 +79,7 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=yourgmail@gmail.com
 SMTP_PASSWORD=your-16-character-app-password
-MAIL_FROM="Nestora <yourgmail@gmail.com>"
+MAIL_FROM="Crestline <yourgmail@gmail.com>"
 ```
 
 ## SendGrid SMTP setup
@@ -90,7 +90,7 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=apikey
 SMTP_PASSWORD=your-sendgrid-api-key
-MAIL_FROM="Nestora <verified@yourdomain.com>"
+MAIL_FROM="Crestline <verified@yourdomain.com>"
 ```
 
 ## Production database
@@ -110,17 +110,16 @@ The downloadable default uses SQLite for simple local self-hosting.
 3. Set `AUTH_SECRET` to a cryptographically random value of at least 32
    characters, and set `NEXT_PUBLIC_APP_URL` to the deployed HTTPS origin.
    Add these variables to both Preview and Production in Vercel.
-4. The Vercel build applies the PostgreSQL Prisma schema with `prisma db push`
-   before building the app. To initialize or update the schema manually instead,
-   set both database variables in your local environment and run:
+4. Apply the PostgreSQL schema separately from the Vercel build. Set both
+   database variables in your local environment and run:
 
 ```bash
 npm run db:postgres
 ```
 
 5. Redeploy on Vercel. Its `build:vercel` script generates the PostgreSQL Prisma
-   Client, applies the schema (including any new tables), and then builds Next.js;
-   local development continues to use SQLite.
+   Client and builds Next.js without attempting a database connection. Local
+   development continues to use SQLite.
 6. Register through the site to create your first account. To grant that account
    administrator access, run this statement in the Supabase SQL Editor after
    replacing the email with your account's address:
@@ -132,7 +131,9 @@ UPDATE "User" SET role = 'ADMIN' WHERE email = 'your-email@example.com';
 The Supabase database starts fresh; existing database data is not migrated.
 Do not commit either Supabase connection string or the auth secret. If the deployed
 site reports a server-side exception, check the Vercel Function Logs and confirm
-both database variables are set for the deployment's environment.
+`DATABASE_URL` contains valid credentials for the deployment's environment.
+The deployment build does not verify database authentication; run
+`npm run db:postgres` after changing the schema to check the direct connection.
 
 ## Deploy
 

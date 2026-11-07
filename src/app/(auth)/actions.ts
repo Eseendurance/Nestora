@@ -31,9 +31,9 @@ export async function registerAction(_prev:unknown,fd:FormData):Promise<{error?:
 
   await createSession({id:user.id,email:user.email,fullName:user.fullName,role:user.role});
 
-  await runAutomation({type:'CONTACT_FORM',title:'Welcome to Nestora',
+  await runAutomation({type:'CONTACT_FORM',title:'Welcome to Crestline',
     detail:'Your built-in inbox is ready. Property updates, enquiries and bookings will appear here.',
-    userId:user.id,emailTo:user.email,emailSubject:'Welcome to Nestora'});
+    userId:user.id,emailTo:user.email,emailSubject:'Welcome to Crestline'});
 
   redirect('/dashboard');
 }

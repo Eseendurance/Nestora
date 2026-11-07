@@ -42,7 +42,7 @@ export default async function AvailabilityPage({
       <div className="container-page">
         <Link href="/dashboard" className="text-sm text-brand">← Dashboard</Link>
         <h1 className="mt-4 font-display text-4xl font-semibold">Viewing availability</h1>
-        <p className="mt-2 max-w-2xl text-muted">Publish the hours when you can host viewings. Nestora only offers open 30-minute slots, applies your buffer, and prevents overlapping or over-capacity bookings.</p>
+        <p className="mt-2 max-w-2xl text-muted">Publish the hours when you can host viewings. Crestline only offers open 30-minute slots, applies your buffer, and prevents overlapping or over-capacity bookings.</p>
 
         {saved && <p role="status" className="mt-5 rounded-xl bg-brand-soft p-3 text-sm text-brand">Your availability has been saved.</p>}
         {error === 'invalid' && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">Check the time zone, daily hours, and booking limits and try again.</p>}
